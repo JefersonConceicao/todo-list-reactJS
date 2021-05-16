@@ -5,9 +5,8 @@ import React, { useState } from 'react'
 import { format } from 'date-fns'
 import pt from 'date-fns/locale/pt'
 
-const todos = []
 const App = () => {
-
+  const [todos, setTodos] = useState(JSON.parse(localStorage.getItem('todos')))
   const [startDate, setStartDate] = useState(new Date());
   const [form, setForm] = useState({
       nomeTodo: null,
@@ -16,16 +15,28 @@ const App = () => {
   
   const submitAddTodo = (form) => {
       if(!!form){
-        console.log(form)
-        todos.push(form);
-        localStorage.setItem('todos', JSON.stringify(todos));
+          if(!!todos){
+            setTodos([...todos, form]);     
+          }else{
+            setTodos([form]);
+          }
+
+          saveTodosStorage();
       }
   }
-  
-  const todoList = JSON.parse(localStorage.getItem('todos'));
- 
-  registerLocale("pt", pt);
 
+  const saveTodosStorage = () => {
+      localStorage.setItem('todos', JSON.stringify(todos))
+  }
+
+  const deleteTodoStorage = (indexTodo) => {
+      todos.splice(indexTodo, 1);
+
+      setTodos([...todos]);
+      saveTodosStorage();
+  }
+
+  registerLocale("pt", pt);
   return (
     <>
     <div className="container"> 
@@ -71,6 +82,7 @@ const App = () => {
                       className="form-control" 
                       startDate={startDate}
                       selected={startDate}
+                      dateFormat="dd/MM/yyyy"
                       onSelect={date => {
                           setStartDate(date);
 
@@ -91,6 +103,8 @@ const App = () => {
     <div className="box">
         <div className="box-header">
             <p> Lista To-do(s) </p>
+
+            <p style={{ float:'right'}}> teste </p>
         </div>
         <div className="box-body">
           <table className="table"> 
@@ -102,16 +116,24 @@ const App = () => {
                 </tr>
               </thead>
               <tbody>
-                  {!!todoList.length && todoList.map((todo, key) => (
-                      <tr key={key}> 
-                          <td> { todo.nomeTodo}  </td> 
-                          <td> { todo.dataTodo} </td> 
-                          <td style={{ textAlign:'center' }}> 
-                            <button type="button" className="btn btn-primary"> X </button> 
-                          </td> 
-                      </tr>
-                    ))
-                  }
+                {!!todos && todos.map((value, index) => (
+                    <tr key={index}> 
+                        <td> {value.nomeTodo} </td> 
+                        <td> {value.dataTodo} </td> 
+                        <td style={{ textAlign: 'center' }}> 
+                          <button 
+                              type="submit" 
+                              className="btn btn-primary"
+                              onClick={e => {
+                                deleteTodoStorage(index);
+                              }}
+                          >  
+                              X   
+                          </button>   
+                        </td> 
+                    </tr>
+                  ))
+                }
               </tbody> 
           </table>
         </div>
