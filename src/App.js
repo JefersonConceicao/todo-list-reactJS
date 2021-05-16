@@ -103,8 +103,6 @@ const App = () => {
     <div className="box">
         <div className="box-header">
             <p> Lista To-do(s) </p>
-
-            <p style={{ float:'right'}}> teste </p>
         </div>
         <div className="box-body">
           <table className="table"> 
